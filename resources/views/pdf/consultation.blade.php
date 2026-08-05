@@ -200,23 +200,19 @@
         </div>
         @endif
 
-        @if($consultation->diagnosis)
         <div class="box">
             <div class="box-header">Diagnóstico Clínico</div>
             <div class="box-content">
-                {!! nl2br(e($consultation->diagnosis)) !!}
+                {!! $consultation->diagnosis ? nl2br(e($consultation->diagnosis)) : '<em>No especificado</em>' !!}
             </div>
         </div>
-        @endif
 
-        @if($consultation->treatment_plan)
         <div class="box">
             <div class="box-header">Plan de Tratamiento</div>
             <div class="box-content">
-                {!! nl2br(e($consultation->treatment_plan)) !!}
+                {!! $consultation->treatment_plan ? nl2br(e($consultation->treatment_plan)) : '<em>No especificado</em>' !!}
             </div>
         </div>
-        @endif
 
         <!-- Signature Area at the end of the content (not fixed) -->
         <div class="signature-block">
