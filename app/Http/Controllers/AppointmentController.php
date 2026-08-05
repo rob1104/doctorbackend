@@ -85,13 +85,7 @@ class AppointmentController extends Controller
             ->first();
 
         if (!$otp) {
-            $debugOtp = \App\Models\OtpVerification::where('phone', $request->phone)->latest()->first();
-            return response()->json([
-                'error' => 'Código OTP inválido o expirado.', 
-                'debug' => $debugOtp, 
-                'now' => Carbon::now()->toDateTimeString(), 
-                'code_provided' => $request->otp_code
-            ], 400);
+            return response()->json(['error' => 'Código OTP inválido o expirado.'], 400);
         }
 
         // Marcar OTP como verificado
