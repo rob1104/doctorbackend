@@ -281,7 +281,7 @@ class AppointmentController extends Controller
                 $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
                 
                 \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
-                    'phone' => $appointment->patient->phone,
+                    'number' => $appointment->patient->phone,
                     'message' => $msgBody
                 ]);
                 
