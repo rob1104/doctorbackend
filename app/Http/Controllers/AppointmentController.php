@@ -196,7 +196,7 @@ class AppointmentController extends Controller
                 return response()->json(['error' => 'Error del Bot WhatsApp: ' . $response->json('error', 'Desconocido')], 500);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'No se pudo conectar con el microservicio de WhatsApp.'], 500);
+            return response()->json(['error' => 'No se pudo conectar con el microservicio de WhatsApp.', 'details' => $e->getMessage(), 'url' => env('WHATSAPP_BOT_URL', 'http://localhost:3001')], 500);
         }
     }
 

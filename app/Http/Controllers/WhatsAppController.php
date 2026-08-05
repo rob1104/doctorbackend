@@ -80,7 +80,7 @@ class WhatsAppController extends Controller
 
             return response()->json(['error' => 'No se pudo enviar el mensaje desde el bot.'], 500);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Fallo la conexión con el bot de Node.'], 500);
+            return response()->json(['error' => 'Fallo la conexión con el bot de Node.', 'details' => $e->getMessage(), 'url' => env('WHATSAPP_BOT_URL', 'http://localhost:3001')], 500);
         }
     }
 }
