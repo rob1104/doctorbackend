@@ -59,7 +59,8 @@ class WhatsAppController extends Controller
 
         // Llamamos al bot
         try {
-            $response = Http::post('http://localhost:3001/api/send-message', [
+            $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
+            $response = Http::post("{$botUrl}/api/send-message", [
                 'number' => $phone,
                 'message' => $request->message
             ]);

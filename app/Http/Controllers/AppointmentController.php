@@ -183,7 +183,8 @@ class AppointmentController extends Controller
 
         // Llamar al microservicio de Node.js
         try {
-            $response = \Illuminate\Support\Facades\Http::post('http://localhost:3001/api/send-message', [
+            $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
+            $response = \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                 'number' => $request->phone,
                 'message' => "Hola, tu código de verificación para agendar la cita con el Dr. Sobrevilla es: *{$code}*. \nExpira en 10 minutos."
             ]);
@@ -252,7 +253,8 @@ class AppointmentController extends Controller
                 
                 $msgBody .= "\n\nPor favor, responde a este mensaje para coordinar una nueva fecha y hora. ¡Gracias por tu comprensión!";
                 
-                \Illuminate\Support\Facades\Http::post('http://localhost:3001/api/send-message', [
+                $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
+                \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                     'number' => $appointment->patient->phone,
                     'message' => $msgBody
                 ]);
