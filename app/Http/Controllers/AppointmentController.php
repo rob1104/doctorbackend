@@ -30,7 +30,7 @@ class AppointmentController extends Controller
 
         while ($currentSlot < $workEnd) {
             $slotString = $currentSlot->format('H:i');
-            
+
             // Checar si existe alguna cita que empalme
             $isBooked = $appointments->some(function ($app) use ($slotString) {
                 // Lógica simple: Si la hora de inicio de la cita coincide con el slot
@@ -174,7 +174,7 @@ class AppointmentController extends Controller
         ]);
 
         $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-        
+
         \App\Models\OtpVerification::create([
             'phone' => $request->phone,
             'code' => $code,
@@ -183,7 +183,7 @@ class AppointmentController extends Controller
 
         // Llamar al microservicio de Node.js
         try {
-            $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
+            $botUrl = env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001');
             $response = \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                 'number' => $request->phone,
                 'message' => "Hola, tu código de verificación para agendar la cita con el Dr. Sobrevilla es: *{$code}*. \nExpira en 10 minutos."
@@ -244,28 +244,28 @@ class AppointmentController extends Controller
                 \Carbon\Carbon::setLocale('es');
                 $dateStr = \Carbon\Carbon::parse($appointment->appointment_date)->translatedFormat('l d \d\e F');
                 $timeStr = \Carbon\Carbon::parse($appointment->start_time)->format('H:i');
-                
+
                 $msgBody = "Hola {$appointment->patient->first_name}, lamentablemente su cita del {$dateStr} a las {$timeStr} ha sido cancelada.";
-                
+
                 if ($request->has('cancelation_reason') && !empty($request->cancelation_reason)) {
                     $msgBody .= "\n\nMotivo: " . $request->cancelation_reason;
                 }
-                
+
                 $msgBody .= "\n\nLamentablemente no es posible atenderle en este momento. Por favor intente reagendando una nueva cita desde nuestro portal web. ¡Gracias por su comprensión!";
-                
+
                 $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
                 \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                     'number' => $appointment->patient->phone,
                     'message' => $msgBody
                 ]);
-                
+
                 // Guardar el mensaje en el historial
                 $savedMsg = \App\Models\WhatsAppMessage::create([
                     'phone' => $appointment->patient->phone,
                     'message' => $msgBody,
                     'is_from_patient' => false
                 ]);
-                
+
                 // Emitir evento para que aparezca en el chat en vivo si está abierto
                 \App\Events\WhatsAppMessageReceived::dispatch($savedMsg);
             } catch (\Exception $e) {
@@ -275,29 +275,29 @@ class AppointmentController extends Controller
                 \Carbon\Carbon::setLocale('es');
                 $dateStr = \Carbon\Carbon::parse($appointment->appointment_date)->translatedFormat('l d \d\e F');
                 $timeStr = \Carbon\Carbon::parse($appointment->start_time)->format('H:i');
-                
+
                 $msgBody = "Hola {$appointment->patient->first_name}, ¡su cita ha sido confirmada!\n\nTe esperamos el {$dateStr} a las {$timeStr}. ¡Nos vemos pronto!";
-                
+
                 $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
-                
+
                 \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                     'number' => $appointment->patient->phone,
                     'message' => $msgBody
                 ]);
-                
+
                 // Guardar el mensaje en el historial
                 $savedMsg = \App\Models\WhatsAppMessage::create([
                     'phone' => $appointment->patient->phone,
                     'message' => $msgBody,
                     'is_from_patient' => false
                 ]);
-                
+
                 // Emitir evento para que aparezca en el chat en vivo si está abierto
                 \App\Events\WhatsAppMessageReceived::dispatch($savedMsg);
             } catch (\Exception $e) {
             }
         }
-        
+
         return response()->json([
             'message' => 'Estado actualizado',
             'appointment' => $appointment->load('patient')
