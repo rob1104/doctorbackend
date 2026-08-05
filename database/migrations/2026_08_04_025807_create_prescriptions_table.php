@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('consultation_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('patient_id')->constrained()->cascadeOnDelete();
-            $table->json('medications')->nullable();
+            $table->text('medications')->nullable();
             $table->text('instructions')->nullable();
             $table->string('folio')->nullable();
             $table->timestamps();
