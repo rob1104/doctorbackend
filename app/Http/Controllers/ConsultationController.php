@@ -17,6 +17,12 @@ class ConsultationController extends Controller
             'diagnosis' => 'nullable|string',
             'treatment_plan' => 'nullable|string',
             'notes' => 'nullable|string',
+            'blood_pressure' => 'nullable|string|max:20',
+            'temperature' => 'nullable|numeric',
+            'heart_rate' => 'nullable|integer',
+            'respiratory_rate' => 'nullable|integer',
+            'weight' => 'nullable|numeric',
+            'height' => 'nullable|numeric',
         ]);
 
         $consultation = Consultation::create($validated);
@@ -38,6 +44,12 @@ class ConsultationController extends Controller
             'diagnosis' => 'nullable|string',
             'treatment_plan' => 'nullable|string',
             'notes' => 'nullable|string',
+            'blood_pressure' => 'nullable|string|max:20',
+            'temperature' => 'nullable|numeric',
+            'heart_rate' => 'nullable|integer',
+            'respiratory_rate' => 'nullable|integer',
+            'weight' => 'nullable|numeric',
+            'height' => 'nullable|numeric',
             
             // For Prescription logic
             'issue_prescription' => 'boolean',
@@ -46,7 +58,8 @@ class ConsultationController extends Controller
         ]);
 
         $consultation->update($request->only([
-            'reason', 'physical_exam', 'diagnosis', 'treatment_plan', 'notes'
+            'reason', 'physical_exam', 'diagnosis', 'treatment_plan', 'notes',
+            'blood_pressure', 'temperature', 'heart_rate', 'respiratory_rate', 'weight', 'height'
         ]));
 
         if ($request->input('issue_prescription')) {

@@ -33,7 +33,9 @@ class Patient extends Model
         'skin_tendency',
         'sun_exposure_level',
         'previous_skin_conditions',
-        'skincare_routine'
+        'skincare_routine',
+        'non_pathological_history',
+        'gyneco_obstetric_history'
     ];
 
     protected $casts = [

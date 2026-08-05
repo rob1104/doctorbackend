@@ -66,6 +66,8 @@ class PatientController extends Controller
             'sun_exposure_level' => 'nullable|string',
             'previous_skin_conditions' => 'nullable|string',
             'skincare_routine' => 'nullable|string',
+            'non_pathological_history' => 'nullable|string',
+            'gyneco_obstetric_history' => 'nullable|string',
         ]);
 
         $patient->update($validated);
