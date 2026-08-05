@@ -251,11 +251,11 @@ class AppointmentController extends Controller
                     $msgBody .= "\n\nMotivo: " . $request->cancelation_reason;
                 }
                 
-                $msgBody .= "\n\nPor favor, responde a este mensaje para coordinar una nueva fecha y hora. ¡Gracias por tu comprensión!";
+                $msgBody .= "\n\nLamentablemente no es posible atenderle en este momento. Por favor intente reagendando una nueva cita desde nuestro portal web. ¡Gracias por su comprensión!";
                 
                 $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
                 \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
-                    'phone' => $appointment->patient->phone,
+                    'number' => $appointment->patient->phone,
                     'message' => $msgBody
                 ]);
                 
