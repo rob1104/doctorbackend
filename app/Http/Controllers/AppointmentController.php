@@ -253,7 +253,7 @@ class AppointmentController extends Controller
 
                 $msgBody .= "\n\nLamentablemente no es posible atenderle en este momento. Por favor intente reagendando una nueva cita desde nuestro portal web. ¡Gracias por su comprensión!";
 
-                $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
+                $botUrl = env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001');
                 \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                     'number' => $appointment->patient->phone,
                     'message' => $msgBody
