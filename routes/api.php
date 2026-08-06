@@ -76,6 +76,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cobranza/{id}', [\App\Http\Controllers\ConsultationPaymentController::class, 'show']);
     Route::put('/cobranza/{id}', [\App\Http\Controllers\ConsultationPaymentController::class, 'update']);
     Route::get('/cobranza/{id}/pdf', [\App\Http\Controllers\ConsultationPaymentController::class, 'generatePdf']);
+    // Usuarios
+    Route::apiResource('users', \App\Http\Controllers\UserController::class);
 });
 
 // Webhook de WhatsApp (recibe mensajes de Node.js, puede no usar sanctum porque es interno)
