@@ -196,7 +196,7 @@ class AppointmentController extends Controller
                 return response()->json(['error' => 'Error del Bot WhatsApp: ' . $response->json('error', 'Desconocido')], 500);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'No se pudo conectar con el microservicio de WhatsApp.', 'details' => $e->getMessage(), 'url' => env('WHATSAPP_BOT_URL', 'http://localhost:3001')], 500);
+            return response()->json(['error' => 'No se pudo conectar con el microservicio de WhatsApp.', 'details' => $e->getMessage(), 'url' => env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001')], 500);
         }
     }
 
@@ -278,7 +278,7 @@ class AppointmentController extends Controller
 
                 $msgBody = "Hola {$appointment->patient->first_name}, ¡su cita ha sido confirmada!\n\nTe esperamos el {$dateStr} a las {$timeStr}. ¡Nos vemos pronto!";
 
-                $botUrl = env('WHATSAPP_BOT_URL', 'http://localhost:3001');
+                $botUrl = env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001');
 
                 \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                     'number' => $appointment->patient->phone,
