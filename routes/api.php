@@ -49,6 +49,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/prescriptions', [\App\Http\Controllers\PrescriptionController::class, 'store']);
     Route::get('/prescriptions/{id}/pdf', [\App\Http\Controllers\PrescriptionController::class, 'generatePdf']);
 
+    // Medicamentos
+    Route::get('/medications/all', [\App\Http\Controllers\MedicationController::class, 'index']);
+    Route::get('/medications', [\App\Http\Controllers\MedicationController::class, 'search']);
+    Route::post('/medications', [\App\Http\Controllers\MedicationController::class, 'store']);
+    Route::put('/medications/{id}', [\App\Http\Controllers\MedicationController::class, 'update']);
+    Route::delete('/medications/{id}', [\App\Http\Controllers\MedicationController::class, 'destroy']);
+
     // Configuración Membrete
     Route::get('/prescription-settings', [\App\Http\Controllers\PrescriptionSettingController::class, 'show']);
     Route::post('/prescription-settings', [\App\Http\Controllers\PrescriptionSettingController::class, 'update']);
@@ -61,6 +68,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // WhatsApp Chat (Admin)
     Route::get('/whatsapp/{phone}', [\App\Http\Controllers\WhatsAppController::class, 'history']);
     Route::post('/whatsapp/send', [\App\Http\Controllers\WhatsAppController::class, 'send']);
+
+    // Cobranza
+    Route::get('/cobranza', [\App\Http\Controllers\ConsultationPaymentController::class, 'index']);
+    Route::get('/cobranza/report/pdf', [\App\Http\Controllers\ConsultationPaymentController::class, 'generateReportPdf']);
+    Route::post('/cobranza', [\App\Http\Controllers\ConsultationPaymentController::class, 'store']);
+    Route::get('/cobranza/{id}', [\App\Http\Controllers\ConsultationPaymentController::class, 'show']);
+    Route::put('/cobranza/{id}', [\App\Http\Controllers\ConsultationPaymentController::class, 'update']);
+    Route::get('/cobranza/{id}/pdf', [\App\Http\Controllers\ConsultationPaymentController::class, 'generatePdf']);
 });
 
 // Webhook de WhatsApp (recibe mensajes de Node.js, puede no usar sanctum porque es interno)

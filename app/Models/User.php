@@ -31,4 +31,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function registeredPayments()
+    {
+        return $this->hasMany(ConsultationPayment::class, 'created_by');
+    }
 }

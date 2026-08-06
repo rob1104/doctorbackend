@@ -9,7 +9,9 @@ class PatientController extends Controller
 {
     public function index()
     {
-        $patients = Patient::where('is_patient', true)->orderBy('last_name')->get();
+        $patients = Patient::with(['consultations' => function($q) {
+            $q->orderBy('created_at', 'desc');
+        }])->where('is_patient', true)->orderBy('last_name')->get();
         return response()->json($patients);
     }
 
@@ -31,7 +33,7 @@ class PatientController extends Controller
     public function show($id)
     {
         $patient = Patient::with(['consultations' => function ($query) {
-            $query->orderBy('created_at', 'desc')->with('prescription');
+            $query->orderBy('created_at', 'desc')->with(['prescription', 'payments']);
         }, 'appointments' => function ($query) {
             $query->orderBy('appointment_date', 'desc')->orderBy('start_time', 'desc');
         }])->findOrFail($id);
@@ -56,6 +58,12 @@ class PatientController extends Controller
             'gender' => 'nullable|string',
             'date_of_birth' => 'nullable|date',
             'address' => 'nullable|string',
+            'neighborhood' => 'nullable|string',
+            'zip_code' => 'nullable|string',
+            'city' => 'nullable|string',
+            'state' => 'nullable|string',
+            'country' => 'nullable|string',
+            'place_of_birth' => 'nullable|string',
             'emergency_contact_name' => 'nullable|string',
             'emergency_contact_phone' => 'nullable|string',
             'marital_status' => 'nullable|string',

@@ -236,7 +236,25 @@
             @if($prescription->medications && is_array($prescription->medications))
                 @foreach($prescription->medications as $med)
                     <div class="medication-item">
-                        <div class="medication-name">• {{ $med['name'] ?? '' }}</div>
+                        @php
+                            $displayName = '';
+                            if (!empty($med['commercial_name'])) {
+                                $displayName .= strtoupper($med['commercial_name']);
+                                if (!empty($med['active_substance'])) {
+                                    $displayName .= ' - ' . strtoupper($med['active_substance']);
+                                }
+                            } else {
+                                $displayName .= strtoupper($med['name'] ?? '');
+                            }
+                        
+                            if (!empty($med['concentration'])) {
+                                $displayName .= ' ' . $med['concentration'];
+                            }
+                            if (!empty($med['route'])) {
+                                $displayName .= ', Vía ' . strtolower($med['route']);
+                            }
+                        @endphp
+                        <div class="medication-name">• {{ $displayName }}</div>
                         <div class="medication-instructions">{{ $med['instructions'] ?? '' }}</div>
                     </div>
                 @endforeach
