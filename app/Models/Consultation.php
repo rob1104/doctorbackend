@@ -30,4 +30,9 @@ class Consultation extends Model
     {
         return $this->hasMany(ConsultationPayment::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

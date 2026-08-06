@@ -9,7 +9,7 @@ class PatientController extends Controller
 {
     public function index()
     {
-        $patients = Patient::with(['consultations' => function($q) {
+        $patients = Patient::with(['user', 'consultations' => function($q) {
             $q->orderBy('created_at', 'desc');
         }])->where('is_patient', true)->orderBy('last_name')->get();
         return response()->json($patients);
@@ -25,6 +25,7 @@ class PatientController extends Controller
         ]);
         
         $validated['is_patient'] = true;
+        $validated['user_id'] = auth()->id() ?? 1;
         
         $patient = Patient::create($validated);
         return response()->json($patient, 201);

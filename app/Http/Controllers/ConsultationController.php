@@ -25,6 +25,7 @@ class ConsultationController extends Controller
             'height' => 'nullable|numeric',
         ]);
 
+        $validated['user_id'] = auth()->id() ?? 1;
         $consultation = Consultation::create($validated);
         
         return response()->json($consultation, 201);

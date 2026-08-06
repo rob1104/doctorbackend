@@ -41,7 +41,8 @@ class Patient extends Model
         'previous_skin_conditions',
         'skincare_routine',
         'non_pathological_history',
-        'gyneco_obstetric_history'
+        'gyneco_obstetric_history',
+        'user_id'
     ];
 
     protected $casts = [
@@ -64,5 +65,10 @@ class Patient extends Model
     public function documents()
     {
         return $this->hasMany(PatientDocument::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
