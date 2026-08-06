@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('consultation_payments', function (Blueprint $table) {
-            if (Schema::hasColumn('consultation_payments', 'appointment_id')) {
+            $hasAppointment = !empty(Illuminate\Support\Facades\DB::select("SHOW COLUMNS FROM `consultation_payments` LIKE 'appointment_id'"));
+            if ($hasAppointment) {
+                // If it has a foreign key constraint, you might need to drop that first, 
+                // but assuming it's just dropping the column or the user already dropped the constraint.
                 $table->dropColumn('appointment_id');
             }
             $table->foreignId('consultation_id')->after('id')->constrained('consultations')->onDelete('cascade');
