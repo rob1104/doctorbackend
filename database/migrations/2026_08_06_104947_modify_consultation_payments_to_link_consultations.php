@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('consultation_payments', function (Blueprint $table) {
             $hasAppointment = !empty(Illuminate\Support\Facades\DB::select("SHOW COLUMNS FROM `consultation_payments` LIKE 'appointment_id'"));
             if ($hasAppointment) {
-                // If it has a foreign key constraint, you might need to drop that first, 
-                // but assuming it's just dropping the column or the user already dropped the constraint.
+                // Drop the foreign key constraint first to prevent MySQL errno 150
+                $table->dropForeign(['appointment_id']);
                 $table->dropColumn('appointment_id');
             }
             $table->foreignId('consultation_id')->after('id')->constrained('consultations')->onDelete('cascade');
