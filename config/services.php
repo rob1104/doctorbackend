@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'bot_url' => env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001'),
+    ],
+
 ];

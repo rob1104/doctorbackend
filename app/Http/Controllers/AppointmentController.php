@@ -183,7 +183,7 @@ class AppointmentController extends Controller
 
         // Llamar al microservicio de Node.js
         try {
-            $botUrl = env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001');
+            $botUrl = config('services.whatsapp.bot_url');
             $response = \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                 'number' => $request->phone,
                 'message' => "Hola, tu código de verificación para agendar la cita con el Dr. Sobrevilla es: *{$code}*. \nExpira en 10 minutos."
@@ -196,7 +196,7 @@ class AppointmentController extends Controller
                 return response()->json(['error' => 'Error del Bot WhatsApp: ' . $response->json('error', 'Desconocido')], 500);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'No se pudo conectar con el microservicio de WhatsApp.', 'details' => $e->getMessage(), 'url' => env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001')], 500);
+            return response()->json(['error' => 'No se pudo conectar con el microservicio de WhatsApp.', 'details' => $e->getMessage(), 'url' => config('services.whatsapp.bot_url')], 500);
         }
     }
 
@@ -253,7 +253,7 @@ class AppointmentController extends Controller
 
                 $msgBody .= "\n\nLamentablemente no es posible atenderle en este momento. Por favor intente reagendando una nueva cita desde nuestro portal web. ¡Gracias por su comprensión!";
 
-                $botUrl = env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001');
+                $botUrl = config('services.whatsapp.bot_url');
                 \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                     'number' => $appointment->patient->phone,
                     'message' => $msgBody
@@ -278,7 +278,7 @@ class AppointmentController extends Controller
 
                 $msgBody = "Hola {$appointment->patient->first_name}, ¡su cita ha sido confirmada!\n\nTe esperamos el {$dateStr} a las {$timeStr}. ¡Nos vemos pronto!";
 
-                $botUrl = env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001');
+                $botUrl = config('services.whatsapp.bot_url');
 
                 \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
                     'number' => $appointment->patient->phone,

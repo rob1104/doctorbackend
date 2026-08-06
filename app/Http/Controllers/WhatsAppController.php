@@ -59,7 +59,7 @@ class WhatsAppController extends Controller
 
         // Llamamos al bot
         try {
-            $botUrl = env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001');
+            $botUrl = config('services.whatsapp.bot_url');
             $response = Http::post("{$botUrl}/api/send-message", [
                 'number' => $phone,
                 'message' => $request->message
@@ -80,7 +80,7 @@ class WhatsAppController extends Controller
 
             return response()->json(['error' => 'No se pudo enviar el mensaje desde el bot.'], 500);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Fallo la conexión con el bot de Node.', 'details' => $e->getMessage(), 'url' => env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001')], 500);
+            return response()->json(['error' => 'Fallo la conexión con el bot de Node.', 'details' => $e->getMessage(), 'url' => config('services.whatsapp.bot_url')], 500);
         }
     }
 }
