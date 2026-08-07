@@ -11,4 +11,15 @@ window.Echo = new Echo({
     wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
+    // Endpoint personalizado que creamos en api.php
+    authEndpoint: import.meta.env.VITE_API_URL 
+        ? import.meta.env.VITE_API_URL + '/broadcasting/auth' 
+        : '/api/broadcasting/auth',
+    auth: {
+        headers: {
+            // Asumiendo que guardas el token en localStorage
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+            Accept: 'application/json',
+        }
+    }
 });
