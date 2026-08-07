@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/appointments/{id}/status', [AppointmentController::class, 'updateStatus']);
 
     // Expediente (Pacientes)
+    Route::get('/patients/all', [\App\Http\Controllers\PatientController::class, 'all']);
     Route::get('/patients', [\App\Http\Controllers\PatientController::class, 'index']);
     Route::post('/patients', [\App\Http\Controllers\PatientController::class, 'store']);
     Route::get('/patients/{id}', [\App\Http\Controllers\PatientController::class, 'show']);

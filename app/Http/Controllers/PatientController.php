@@ -15,6 +15,15 @@ class PatientController extends Controller
         return response()->json($patients);
     }
 
+    public function all()
+    {
+        // Retorna todos: pacientes y prospectos para el autocomplete del dashboard
+        $patients = Patient::select('id', 'first_name', 'last_name', 'phone', 'is_patient')
+            ->orderBy('first_name')
+            ->get();
+        return response()->json($patients);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

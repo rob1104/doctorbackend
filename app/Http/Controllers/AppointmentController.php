@@ -129,12 +129,34 @@ class AppointmentController extends Controller
     public function adminStore(Request $request)
     {
         $request->validate([
-            'patient_id' => 'required|exists:patients,id',
+            'patient_id' => 'nullable|exists:patients,id',
+            'first_name' => 'required_without:patient_id|string|max:255',
+            'last_name' => 'required_without:patient_id|string|max:255',
+            'phone' => 'required_without:patient_id|string|max:20',
             'type' => 'required|in:clinico,estetico',
             'appointment_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'notes' => 'nullable|string',
         ]);
+
+        $patientId = $request->patient_id;
+
+        // Si no enviaron patient_id, creamos un prospecto al vuelo
+        if (!$patientId) {
+            // Checar si ya existe alguien con ese teléfono para evitar duplicidad
+            $existingPatient = \App\Models\Patient::where('phone', $request->phone)->first();
+            if ($existingPatient) {
+                $patientId = $existingPatient->id;
+            } else {
+                $newProspect = \App\Models\Patient::create([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'phone' => $request->phone,
+                    'is_patient' => false,
+                ]);
+                $patientId = $newProspect->id;
+            }
+        }
 
         // Verificar si la hora ya fue confirmada
         $isBooked = Appointment::where('appointment_date', $request->appointment_date)
@@ -148,10 +170,10 @@ class AppointmentController extends Controller
             ], 422);
         }
 
-        $endTime = Carbon::parse($request->start_time)->addMinutes(30)->format('H:i');
+        $endTime = \Carbon\Carbon::parse($request->start_time)->addMinutes(30)->format('H:i');
 
         $appointment = Appointment::create([
-            'patient_id' => $request->patient_id,
+            'patient_id' => $patientId,
             'type' => $request->type,
             'appointment_date' => $request->appointment_date,
             'start_time' => $request->start_time,
