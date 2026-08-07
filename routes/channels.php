@@ -10,6 +10,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('admin.notifications', function ($user) {
-    // Solo permitir acceso si el usuario es admin o asistente
-    return in_array($user->role, ['admin', 'assistant']);
+    // Permitir acceso a admin, doctor y asistente
+    return in_array($user->role, ['admin', 'doctor', 'asistente']);
 });

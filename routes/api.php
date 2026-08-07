@@ -80,5 +80,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', \App\Http\Controllers\UserController::class);
 });
 
+// Autenticación de Broadcasting (Reverb/Pusher) para SPA con Sanctum
+Route::post('/broadcasting/auth', [\Illuminate\Broadcasting\BroadcastController::class, 'authenticate'])
+    ->middleware('auth:sanctum');
+
 // Webhook de WhatsApp (recibe mensajes de Node.js, puede no usar sanctum porque es interno)
 Route::post('/whatsapp/webhook', [\App\Http\Controllers\WhatsAppController::class, 'webhook']);
