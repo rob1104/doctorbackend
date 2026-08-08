@@ -56,8 +56,9 @@ class WhatsAppController extends Controller
     {
         // Normalizar teléfono
         $phone = preg_replace('/\D/', '', $phone);
+        $searchPhone = substr($phone, -10);
 
-        $messages = WhatsAppMessage::where('phone', 'LIKE', "%{$phone}%")
+        $messages = WhatsAppMessage::where('phone', 'LIKE', "%{$searchPhone}%")
             ->orderBy('created_at', 'asc')
             ->get();
 
