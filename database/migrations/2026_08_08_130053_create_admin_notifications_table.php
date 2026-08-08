@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('admin_notifications', function (Blueprint $table) {
             $table->id();
             $table->string('type'); // 'whatsapp' or 'appointment'
-            $table->json('data'); // payload
+            $table->text('data'); // payload
             $table->boolean('is_read')->default(false);
             $table->timestamps();
         });
