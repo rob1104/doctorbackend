@@ -10,7 +10,7 @@ class AdminNotificationController extends Controller
 {
     public function index()
     {
-        $notifications = AdminNotification::orderBy('created_at', 'desc')->take(50)->get();
+        $notifications = AdminNotification::where('is_read', false)->orderBy('created_at', 'desc')->take(50)->get();
         return response()->json($notifications);
     }
 

@@ -30,9 +30,17 @@ class WhatsAppController extends Controller
 
         // Guardar notificación si es del paciente
         if ($msg->is_from_patient) {
+            $patient = \App\Models\Patient::where('phone', 'LIKE', "%{$phone}%")->first();
+            $data = $msg->toArray();
+            if ($patient) {
+                $data['patient_name'] = $patient->first_name . ' ' . $patient->last_name;
+            } else {
+                $data['patient_name'] = 'Desconocido';
+            }
+
             \App\Models\AdminNotification::create([
                 'type' => 'whatsapp',
-                'data' => $msg->toArray(),
+                'data' => $data,
             ]);
         }
 
