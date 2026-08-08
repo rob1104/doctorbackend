@@ -74,6 +74,11 @@ class WhatsAppController extends Controller
         ]);
 
         $phone = preg_replace('/\D/', '', $request->phone);
+        
+        // Asegurar que tenga el código de país (521 para México por defecto si son 10 dígitos)
+        if (strlen($phone) === 10) {
+            $phone = '521' . $phone;
+        }
 
         // Llamamos al bot
         try {
