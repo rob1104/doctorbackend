@@ -116,6 +116,12 @@ class AppointmentController extends Controller
             'notes' => $request->notes,
         ]);
 
+        // Guardar notificacion en BD
+        \App\Models\AdminNotification::create([
+            'type' => 'appointment',
+            'data' => $appointment->load('patient')->toArray(),
+        ]);
+
         // Emitir evento Reverb
         AppointmentCreated::dispatch($appointment);
 

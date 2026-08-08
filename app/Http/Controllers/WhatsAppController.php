@@ -28,6 +28,14 @@ class WhatsAppController extends Controller
             'is_from_patient' => true
         ]);
 
+        // Guardar notificación si es del paciente
+        if ($msg->is_from_patient) {
+            \App\Models\AdminNotification::create([
+                'type' => 'whatsapp',
+                'data' => $msg->toArray(),
+            ]);
+        }
+
         // Emitimos el evento a Reverb para actualizar el Dashboard
         WhatsAppMessageReceived::dispatch($msg);
 

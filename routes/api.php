@@ -79,6 +79,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cobranza/{id}/pdf', [\App\Http\Controllers\ConsultationPaymentController::class, 'generatePdf']);
     // Usuarios
     Route::apiResource('users', \App\Http\Controllers\UserController::class);
+    // Notificaciones
+    Route::get('/notifications', [\App\Http\Controllers\AdminNotificationController::class, 'index']);
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\AdminNotificationController::class, 'markAllAsRead']);
+    Route::patch('/notifications/{notification}/read', [\App\Http\Controllers\AdminNotificationController::class, 'markAsRead']);
 });
 
 // Autenticación de Broadcasting (Reverb/Pusher) para SPA con Sanctum
