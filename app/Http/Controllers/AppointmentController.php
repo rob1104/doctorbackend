@@ -326,6 +326,8 @@ class AppointmentController extends Controller
             }
         }
 
+        \App\Events\AppointmentUpdated::dispatch($appointment);
+
         return response()->json([
             'message' => 'Estado actualizado',
             'appointment' => $appointment->load('patient')
