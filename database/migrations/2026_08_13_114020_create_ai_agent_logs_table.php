@@ -17,8 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('action');
             $table->string('tool')->nullable();
-            $table->json('input')->nullable();
-            $table->json('output')->nullable();
+            $table->text('input')->nullable();
+            $table->text('output')->nullable();
             $table->string('status')->default('success'); // success, error
             $table->timestamps();
         });
