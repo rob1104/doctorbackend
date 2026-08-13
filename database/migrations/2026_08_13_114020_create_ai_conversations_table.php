@@ -15,8 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('patient_id')->nullable();
             $table->string('session_id')->nullable();
-            $table->json('messages')->nullable();
-            $table->json('context')->nullable();
+            $table->text('messages')->nullable();
+            $table->text('context')->nullable();
             $table->string('status')->default('active');
             $table->timestamps();
         });
