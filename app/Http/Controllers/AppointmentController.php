@@ -14,6 +14,15 @@ class AppointmentController extends Controller
     public function availability(Request $request)
     {
         $date = $request->query('date', Carbon::today()->toDateString());
+        $parsedDate = Carbon::parse($date);
+        
+        // No hay citas los domingos
+        if ($parsedDate->isSunday()) {
+            return response()->json([
+                'date' => $date,
+                'available_slots' => []
+            ]);
+        }
 
         // Solo las citas confirmadas bloquean el horario
         $appointments = Appointment::where('appointment_date', $date)
@@ -27,9 +36,18 @@ class AppointmentController extends Controller
 
         $availableSlots = [];
         $currentSlot = $workStart->copy();
+        
+        $parsedDate = Carbon::parse($date);
+        $cutoffTime = Carbon::now()->addHour();
 
         while ($currentSlot < $workEnd) {
             $slotString = $currentSlot->format('H:i');
+
+            // Si es hoy, ignorar las horas pasadas y la siguiente hora
+            if ($parsedDate->isToday() && $currentSlot < $cutoffTime) {
+                $currentSlot->addMinutes($slotDuration);
+                continue;
+            }
 
             // Checar si existe alguna cita que empalme
             $isBooked = $appointments->some(function ($app) use ($slotString) {

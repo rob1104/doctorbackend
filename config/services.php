@@ -39,4 +39,12 @@ return [
         'bot_url' => env('WHATSAPP_BOT_URL', 'http://xis.myftp.biz:3001'),
     ],
 
+    'ai' => [
+        'provider' => env('SERVICES_AI_PROVIDER', 'openai'),
+        'api_key' => env('SERVICES_AI_API_KEY', ''),
+        'model' => env('SERVICES_AI_MODEL', 'gpt-4o-mini'),
+        'temperature' => env('SERVICES_AI_TEMPERATURE', 0.2),
+        'base_url' => env('SERVICES_AI_BASE_URL', 'https://api.openai.com/v1/chat/completions'),
+    ],
+
 ];

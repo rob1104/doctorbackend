@@ -17,6 +17,10 @@ Route::get('/availability', [AppointmentController::class, 'availability']);
 Route::post('/otp/send', [AppointmentController::class, 'sendOtp']);
 Route::post('/appointments', [AppointmentController::class, 'store']);
 
+// Agente IA
+Route::post('/ai/medical-agent/chat', [\App\Http\Controllers\AI\MedicalAgentController::class, 'chat'])
+    ->middleware('throttle:30,1');
+
 // Rutas Privadas / Administrativas
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
