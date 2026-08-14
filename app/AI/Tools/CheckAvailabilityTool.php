@@ -51,9 +51,9 @@ class CheckAvailabilityTool extends BaseTool
             ];
         }
 
-        // Obtener citas confirmadas para ese día
+        // Obtener citas confirmadas o pendientes para ese día
         $appointments = Appointment::where('appointment_date', $date)
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'pending'])
             ->get();
 
         $workStart = Carbon::parse($date . ' 09:00:00');

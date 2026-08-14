@@ -104,7 +104,7 @@ class CreateAppointmentTool extends BaseTool
         // 2. Verificar empalmes (Doble Reserva)
         $isBooked = Appointment::where('appointment_date', $date)
             ->where('start_time', Carbon::parse($time)->format('H:i:s'))
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'pending'])
             ->exists();
 
         if ($isBooked) {

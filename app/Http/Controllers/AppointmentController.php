@@ -24,9 +24,9 @@ class AppointmentController extends Controller
             ]);
         }
 
-        // Solo las citas confirmadas bloquean el horario
+        // Las citas confirmadas y pendientes bloquean el horario
         $appointments = Appointment::where('appointment_date', $date)
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'pending'])
             ->get();
 
         // Horario laboral de ejemplo: 09:00 a 17:00
@@ -83,10 +83,10 @@ class AppointmentController extends Controller
             'otp_code' => 'required|string|size:6'
         ]);
 
-        // Verificar si la hora ya fue confirmada para otro paciente
+        // Verificar si la hora ya fue confirmada o está pendiente para otro paciente
         $isBooked = Appointment::where('appointment_date', $request->appointment_date)
             ->where('start_time', \Carbon\Carbon::parse($request->start_time)->format('H:i:s'))
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'pending'])
             ->exists();
 
         if ($isBooked) {
@@ -182,10 +182,10 @@ class AppointmentController extends Controller
             }
         }
 
-        // Verificar si la hora ya fue confirmada
+        // Verificar si la hora ya fue confirmada o está pendiente
         $isBooked = Appointment::where('appointment_date', $request->appointment_date)
             ->where('start_time', \Carbon\Carbon::parse($request->start_time)->format('H:i:s'))
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'pending'])
             ->exists();
 
         if ($isBooked) {
@@ -267,10 +267,10 @@ class AppointmentController extends Controller
         $appointment = Appointment::with('patient')->findOrFail($id);
 
         if ($request->status === 'approved') {
-            // Verificar que no haya otra cita aprobada en esa misma hora
+            // Verificar que no haya otra cita aprobada o pendiente en esa misma hora
             $isBooked = Appointment::where('appointment_date', $appointment->appointment_date)
                 ->where('start_time', $appointment->start_time)
-                ->where('status', 'approved')
+                ->whereIn('status', ['approved', 'pending'])
                 ->where('id', '!=', $appointment->id)
                 ->exists();
 
