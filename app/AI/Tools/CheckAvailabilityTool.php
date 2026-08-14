@@ -94,7 +94,7 @@ class CheckAvailabilityTool extends BaseTool
 
         return [
             'available' => count($availableSlots) > 0,
-            'slots' => array_slice($availableSlots, 0, 5), // Regresar los próximos 5 para no saturar al LLM
+            'slots' => $availableSlots,
             'message' => count($availableSlots) > 0 ? 'Horarios encontrados.' : 'No hay horarios disponibles para esta fecha.',
         ];
     }
