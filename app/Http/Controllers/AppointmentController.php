@@ -148,6 +148,30 @@ class AppointmentController extends Controller
             'data' => $appointment->load('patient')->toArray(),
         ]);
 
+        // Enviar WhatsApp al paciente notificando que está en revisión
+        try {
+            $botUrl = config('services.whatsapp.bot_url');
+            \Carbon\Carbon::setLocale('es');
+            $dateStr = \Carbon\Carbon::parse($appointment->appointment_date)->translatedFormat('l d \d\e F');
+            $timeStr = \Carbon\Carbon::parse($appointment->start_time)->format('H:i');
+            
+            $msgBody = "Hola {$patient->first_name}, hemos recibido tu solicitud de cita para el {$dateStr} a las {$timeStr}.\n\nTu cita se encuentra *en revisión*. Te notificaremos por este medio en cuanto sea confirmada. ¡Gracias!";
+
+            \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
+                'number' => $patient->phone,
+                'message' => $msgBody
+            ]);
+
+            \App\Models\WhatsAppMessage::create([
+                'patient_id' => $patient->id,
+                'message' => $msgBody,
+                'direction' => 'outbound',
+                'status' => 'sent'
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error enviando mensaje de revisión: ' . $e->getMessage());
+        }
+
         // Emitir evento Reverb
         AppointmentCreated::dispatch($appointment);
 
