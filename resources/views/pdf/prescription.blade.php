@@ -16,7 +16,6 @@
         .half-page {
             /* Letter height is 27.94cm. Half is 13.97cm */
             height: 12.3cm; /* Adjusted height to account for padding manually without border-box */
-            width: 100%;
             padding: 0.8cm 1.5cm;
             overflow: hidden;
             position: relative;
@@ -27,10 +26,6 @@
             margin: 0;
             padding: 0;
             height: 0;
-            position: absolute;
-            top: 13.97cm;
-            left: 0;
-            z-index: 100;
         }
         
         .header {
