@@ -9,7 +9,7 @@ class ConsultationController extends Controller
 {
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'patient_id' => 'required|exists:patients,id',
             'appointment_id' => 'nullable|exists:appointments,id',
             'reason' => 'nullable|string',
@@ -25,6 +25,15 @@ class ConsultationController extends Controller
             'height' => 'nullable|numeric',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error de validación en los datos capturados.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+
         $validated['user_id'] = auth()->id() ?? 1;
         $consultation = Consultation::create($validated);
         
@@ -39,7 +48,7 @@ class ConsultationController extends Controller
             return response()->json(['message' => 'Cannot edit a finished consultation'], 403);
         }
 
-        $validated = $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'reason' => 'nullable|string',
             'physical_exam' => 'nullable|string',
             'diagnosis' => 'nullable|string',
@@ -57,6 +66,15 @@ class ConsultationController extends Controller
             'medications' => 'nullable|array',
             'prescription_instructions' => 'nullable|string',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error de validación en los datos capturados.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $validated = $validator->validated();
 
         $consultation->update($request->only([
             'reason', 'physical_exam', 'diagnosis', 'treatment_plan', 'notes',
