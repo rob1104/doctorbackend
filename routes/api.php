@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Control de Disponibilidad (Admin)
     Route::get('/availability/blocked', [\App\Http\Controllers\AppointmentController::class, 'getBlockedSlots']);
     Route::post('/availability/toggle', [\App\Http\Controllers\AppointmentController::class, 'toggleBlockedSlot']);
+    Route::post('/availability/toggle-all', [\App\Http\Controllers\AppointmentController::class, 'toggleAllBlockedSlots']);
 
     // WhatsApp Chat (Admin)
     Route::get('/whatsapp/{phone}', [\App\Http\Controllers\WhatsAppController::class, 'history']);

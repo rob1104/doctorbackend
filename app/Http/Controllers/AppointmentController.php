@@ -400,4 +400,31 @@ class AppointmentController extends Controller
 
         return response()->json(['message' => 'Disponibilidad actualizada']);
     }
+
+    public function toggleAllBlockedSlots(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'is_blocked' => 'required|boolean',
+            'times' => 'nullable|array'
+        ]);
+
+        if (!$request->is_blocked) {
+            \App\Models\BlockedTimeSlot::where('date', $request->date)->delete();
+        } else {
+            if ($request->has('times')) {
+                foreach ($request->times as $time) {
+                    \App\Models\BlockedTimeSlot::firstOrCreate([
+                        'date' => $request->date,
+                        'start_time' => $time,
+                    ], [
+                        'end_time' => \Carbon\Carbon::parse($time)->addMinutes(30)->format('H:i:s'),
+                        'reason' => 'Bloqueo manual masivo',
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['message' => 'Disponibilidad masiva actualizada']);
+    }
 }
