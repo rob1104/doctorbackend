@@ -18,11 +18,21 @@ class ConsultationController extends Controller
             'treatment_plan' => 'nullable|string',
             'notes' => 'nullable|string',
             'blood_pressure' => 'nullable|string|max:20',
-            'temperature' => 'nullable|numeric',
-            'heart_rate' => 'nullable|integer',
-            'respiratory_rate' => 'nullable|integer',
-            'weight' => 'nullable|numeric',
-            'height' => 'nullable|numeric',
+            'temperature' => 'nullable|numeric|min:20|max:50',
+            'heart_rate' => 'nullable|integer|min:0|max:300',
+            'respiratory_rate' => 'nullable|integer|min:0|max:100',
+            'weight' => 'nullable|numeric|min:0|max:500',
+            'height' => 'nullable|numeric|min:0|max:3',
+        ], [
+            'blood_pressure.max' => 'La presión arterial no debe exceder 20 caracteres.',
+            'temperature.max' => 'La temperatura parece incorrecta (máximo 50 °C).',
+            'temperature.min' => 'La temperatura parece incorrecta (mínimo 20 °C).',
+            'heart_rate.max' => 'Frecuencia cardíaca inválida (máx 300).',
+            'respiratory_rate.max' => 'Frecuencia respiratoria inválida (máx 100).',
+            'weight.max' => 'El peso parece incorrecto (máximo 500 kg).',
+            'height.max' => 'La talla parece incorrecta (máximo 3 m).',
+            'numeric' => 'Este campo debe ser un número.',
+            'integer' => 'Este campo debe ser un número entero.',
         ]);
 
         if ($validator->fails()) {
@@ -55,16 +65,26 @@ class ConsultationController extends Controller
             'treatment_plan' => 'nullable|string',
             'notes' => 'nullable|string',
             'blood_pressure' => 'nullable|string|max:20',
-            'temperature' => 'nullable|numeric',
-            'heart_rate' => 'nullable|integer',
-            'respiratory_rate' => 'nullable|integer',
-            'weight' => 'nullable|numeric',
-            'height' => 'nullable|numeric',
+            'temperature' => 'nullable|numeric|min:20|max:50',
+            'heart_rate' => 'nullable|integer|min:0|max:300',
+            'respiratory_rate' => 'nullable|integer|min:0|max:100',
+            'weight' => 'nullable|numeric|min:0|max:500',
+            'height' => 'nullable|numeric|min:0|max:3',
             
             // For Prescription logic
             'issue_prescription' => 'boolean',
             'medications' => 'nullable|array',
             'prescription_instructions' => 'nullable|string',
+        ], [
+            'blood_pressure.max' => 'La presión arterial no debe exceder 20 caracteres.',
+            'temperature.max' => 'La temperatura parece incorrecta (máximo 50 °C).',
+            'temperature.min' => 'La temperatura parece incorrecta (mínimo 20 °C).',
+            'heart_rate.max' => 'Frecuencia cardíaca inválida (máx 300).',
+            'respiratory_rate.max' => 'Frecuencia respiratoria inválida (máx 100).',
+            'weight.max' => 'El peso parece incorrecto (máximo 500 kg).',
+            'height.max' => 'La talla parece incorrecta (máximo 3 m).',
+            'numeric' => 'Este campo debe ser un número.',
+            'integer' => 'Este campo debe ser un número entero.',
         ]);
 
         if ($validator->fails()) {
