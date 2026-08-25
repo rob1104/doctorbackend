@@ -29,6 +29,9 @@ class AppointmentController extends Controller
             ->whereIn('status', ['approved', 'pending'])
             ->get();
 
+        // Bloqueos manuales
+        $blockedSlots = \App\Models\BlockedTimeSlot::where('date', $date)->get();
+
         // Horario laboral de ejemplo: 09:00 a 17:00
         $workStart = Carbon::createFromTimeString('09:00');
         $workEnd = Carbon::createFromTimeString('17:00');
@@ -55,7 +58,12 @@ class AppointmentController extends Controller
                 return Carbon::parse($app->start_time)->format('H:i') === $slotString;
             });
 
-            if (!$isBooked) {
+            // Checar si el slot está bloqueado manual/reagendamiento
+            $isBlocked = $blockedSlots->some(function ($block) use ($slotString) {
+                return Carbon::parse($block->start_time)->format('H:i') === $slotString;
+            });
+
+            if (!$isBooked && !$isBlocked) {
                 $availableSlots[] = $slotString;
             }
 
@@ -291,13 +299,22 @@ class AppointmentController extends Controller
                 $dateStr = \Carbon\Carbon::parse($appointment->appointment_date)->translatedFormat('l d \d\e F');
                 $timeStr = \Carbon\Carbon::parse($appointment->start_time)->format('H:i');
 
-                $msgBody = "Hola {$appointment->patient->first_name}, lamentablemente su cita del {$dateStr} a las {$timeStr} ha sido cancelada.";
+                $msgBody = "Hola {$appointment->patient->first_name}, lamentablemente su cita del {$dateStr} a las {$timeStr} tuvo que ser reagendada.";
 
                 if ($request->has('cancelation_reason') && !empty($request->cancelation_reason)) {
                     $msgBody .= "\n\nMotivo: " . $request->cancelation_reason;
                 }
 
-                $msgBody .= "\n\nLamentablemente no es posible atenderle en este momento. Por favor intente reagendando una nueva cita desde nuestro portal web. ¡Gracias por su comprensión!";
+                $msgBody .= "\n\nPor favor, selecciona un nuevo horario en este enlace: https://doctor.xiserp.mx/#/\n¡Gracias por tu comprensión!";
+
+                // Bloquear el slot permanentemente
+                \App\Models\BlockedTimeSlot::firstOrCreate([
+                    'date' => $appointment->appointment_date,
+                    'start_time' => $appointment->start_time,
+                ], [
+                    'end_time' => \Carbon\Carbon::parse($appointment->start_time)->addMinutes(30)->format('H:i:s'),
+                    'reason' => 'Cita reagendada de ' . $appointment->patient->first_name . ' ' . $appointment->patient->last_name,
+                ]);
 
                 $botUrl = config('services.whatsapp.bot_url');
                 \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
@@ -350,5 +367,37 @@ class AppointmentController extends Controller
             'message' => 'Estado actualizado',
             'appointment' => $appointment->load('patient')
         ]);
+    }
+
+    public function getBlockedSlots(Request $request)
+    {
+        $date = $request->query('date', Carbon::today()->toDateString());
+        $blockedSlots = \App\Models\BlockedTimeSlot::where('date', $date)->get();
+        return response()->json($blockedSlots);
+    }
+
+    public function toggleBlockedSlot(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'is_blocked' => 'required|boolean'
+        ]);
+
+        if ($request->is_blocked) {
+            $slot = \App\Models\BlockedTimeSlot::firstOrCreate([
+                'date' => $request->date,
+                'start_time' => $request->start_time,
+            ], [
+                'end_time' => \Carbon\Carbon::parse($request->start_time)->addMinutes(30)->format('H:i:s'),
+                'reason' => 'Bloqueo manual',
+            ]);
+        } else {
+            \App\Models\BlockedTimeSlot::where('date', $request->date)
+                ->where('start_time', $request->start_time)
+                ->delete();
+        }
+
+        return response()->json(['message' => 'Disponibilidad actualizada']);
     }
 }

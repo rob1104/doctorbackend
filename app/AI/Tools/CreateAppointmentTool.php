@@ -107,7 +107,11 @@ class CreateAppointmentTool extends BaseTool
             ->whereIn('status', ['approved', 'pending'])
             ->exists();
 
-        if ($isBooked) {
+        $isBlocked = \App\Models\BlockedTimeSlot::where('date', $date)
+            ->where('start_time', Carbon::parse($time)->format('H:i:s'))
+            ->exists();
+
+        if ($isBooked || $isBlocked) {
             return [
                 'error' => 'conflict',
                 'message' => 'Lo sentimos, este horario acaba de ser ocupado. Por favor, consulta disponibilidad para buscar otro horario.'
@@ -134,6 +138,22 @@ class CreateAppointmentTool extends BaseTool
                 'data' => $appointment->load('patient')->toArray(),
             ]);
             AppointmentCreated::dispatch($appointment);
+
+            // WhatsApp Notification to Patient
+            $botUrl = config('services.whatsapp.bot_url');
+            $patientPhone = $appointment->patient->phone;
+            $msgBody = "Gracias por agendar, en breve recibirás un mensaje de confirmación de la cita o un mensaje para reagendar en otro horario en caso de que haya ocurrido alguna incidencia...";
+            
+            \Illuminate\Support\Facades\Http::post("{$botUrl}/api/send-message", [
+                'number' => $patientPhone,
+                'message' => $msgBody
+            ]);
+            
+            \App\Models\WhatsAppMessage::create([
+                'phone' => $patientPhone,
+                'message' => $msgBody,
+                'is_from_patient' => false
+            ]);
         } catch (\Exception $e) {
             // Ignorar errores de notificaciones
         }

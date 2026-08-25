@@ -56,6 +56,9 @@ class CheckAvailabilityTool extends BaseTool
             ->whereIn('status', ['approved', 'pending'])
             ->get();
 
+        // Obtener bloques manuales
+        $blockedSlots = \App\Models\BlockedTimeSlot::where('date', $date)->get();
+
         $workStart = Carbon::parse($date . ' 09:00:00');
         $workEnd = Carbon::parse($date . ' 17:00:00');
         $slotDuration = 30; // Minutos
@@ -82,7 +85,11 @@ class CheckAvailabilityTool extends BaseTool
                 return Carbon::parse($app->start_time)->format('H:i') === $slotString;
             });
 
-            if (!$isBooked) {
+            $isBlocked = $blockedSlots->some(function ($block) use ($slotString) {
+                return Carbon::parse($block->start_time)->format('H:i') === $slotString;
+            });
+
+            if (!$isBooked && !$isBlocked) {
                 $availableSlots[] = [
                     'date' => $date,
                     'time' => $slotString,
