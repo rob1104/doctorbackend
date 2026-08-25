@@ -5,220 +5,156 @@
     <title>Receta Médica - {{ $prescription->folio }}</title>
     <style>
         @page {
-            margin: 1.5cm 2cm 3.5cm 2cm;
+            margin: 0cm; /* Remove page margins to control it via CSS */
         }
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            color: #334155;
-            font-size: 9.5pt;
-            line-height: 1.3;
+            color: #1e293b;
         }
-        .container {
+        .half-page {
+            /* Letter height is 27.94cm. Half is 13.97cm */
+            height: 12.3cm; /* Adjusted height to account for padding manually without border-box */
             width: 100%;
+            padding: 0.8cm 1.5cm;
+            overflow: hidden;
+            position: relative;
         }
-        .header {
-            border-bottom: 1px solid #047857; /* Emerald Green */
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            display: table;
+        .cut-line {
+            border-top: 1px dashed #94a3b8;
             width: 100%;
-        }
-        .header-col {
-            display: table-cell;
-            vertical-align: middle;
-        }
-        .doctor-name {
-            font-size: 18pt;
-            font-weight: bold;
-            color: #047857;
-            margin: 0 0 2px 0;
-        }
-        .specialty {
-            font-size: 10pt;
-            color: #475569;
-            margin: 0 0 2px 0;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .credentials {
-            font-size: 8pt;
-            color: #64748b;
-            margin: 1px 0;
+            margin: 0;
+            padding: 0;
+            height: 0;
+            position: absolute;
+            top: 13.97cm;
+            left: 0;
+            z-index: 100;
         }
         
-        /* Patient Info Box */
+        .header {
+            border-bottom: 1px solid #047857;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+            width: 100%;
+        }
+        .header table { width: 100%; border-collapse: collapse; }
+        .header td { vertical-align: middle; }
+        
+        .doctor-name { font-size: 14pt; font-weight: bold; color: #047857; margin: 0; }
+        .specialty { font-size: 8.5pt; color: #475569; margin: 0; font-weight: bold; text-transform: uppercase; }
+        .credentials { font-size: 7.5pt; color: #64748b; margin: 0; }
+        
         .patient-box {
             border: 1px solid #e2e8f0;
-            border-left: 4px solid #047857;
-            border-radius: 6px;
+            border-left: 3px solid #047857;
             background-color: #f8fafc;
-            padding: 6px 10px;
-            margin-bottom: 15px;
+            padding: 4px 6px;
+            margin-bottom: 8px;
+            border-radius: 4px;
         }
-        .patient-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .patient-table td {
-            padding: 4px 8px;
-            vertical-align: top;
-        }
-        .label {
-            font-weight: bold;
-            color: #475569;
-            font-size: 8.5pt;
-            text-transform: uppercase;
-        }
+        .patient-table { width: 100%; border-collapse: collapse; font-size: 8pt; }
+        .patient-table td { padding: 2px 4px; vertical-align: top; }
+        .label { font-weight: bold; color: #475569; text-transform: uppercase; font-size: 7.5pt; }
 
-        /* Rx Title */
         .rx-title {
-            font-size: 28pt;
+            font-size: 16pt;
             font-weight: 800;
             color: #047857;
             font-style: italic;
             border-bottom: 1px solid #cbd5e1;
-            padding-bottom: 2px;
-            margin-bottom: 15px;
+            padding-bottom: 1px;
+            margin-bottom: 8px;
         }
 
-        /* Medications */
-        .medication-item {
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px dotted #cbd5e1;
+        .medications-container {
+            font-size: 8pt;
+            padding-bottom: 3.5cm; /* Space for absolute footer */
         }
-        .medication-item:last-child {
-            border-bottom: none;
+        .medication-item {
+            margin-bottom: 4px;
         }
         .medication-name {
-            font-size: 11pt;
             font-weight: bold;
             color: #0f172a;
-            margin-bottom: 2px;
         }
         .medication-instructions {
-            font-size: 9.5pt;
-            color: #475569;
-            padding-left: 10px;
+            color: #334155;
+            padding-left: 8px;
         }
 
-        /* General Instructions */
         .general-instructions {
-            margin-top: 20px;
-            padding: 10px;
+            margin-top: 8px;
+            padding: 6px;
             background-color: #f0fdf4;
             border: 1px solid #bbf7d0;
-            border-radius: 6px;
+            border-radius: 4px;
+            font-size: 8pt;
         }
-        .general-instructions h4 {
-            color: #166534;
-            margin-top: 0;
-            margin-bottom: 5px;
-            font-size: 10pt;
-            text-transform: uppercase;
-        }
-        .general-instructions p {
-            margin: 0;
-            color: #166534;
-            font-size: 9pt;
-        }
+        .general-instructions h4 { margin: 0 0 2px 0; font-size: 8pt; color: #166534; }
+        .general-instructions p { margin: 0; color: #166534; }
 
-        /* Fixed Footer */
-        .footer {
-            position: fixed;
-            bottom: -2cm;
-            width: 100%;
-            left: 0;
+        .footer-area {
+            position: absolute;
+            bottom: 0.5cm;
+            left: 1.5cm;
+            right: 1.5cm;
             text-align: center;
-        }
-        .signature-area {
-            text-align: center;
-            margin-bottom: 10px;
         }
         .signature-line {
-            width: 200px;
+            width: 150px;
             border-bottom: 1px solid #000;
-            margin: 0 auto 5px auto;
+            margin: 0 auto 3px auto;
         }
-        .signature-name {
-            font-weight: bold;
-            font-size: 10pt;
-            color: #1e293b;
-        }
-        .clinic-info {
-            font-size: 8pt;
-            color: #64748b;
-        }
-        .legends {
-            font-size: 7pt;
-            color: #94a3b8;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 5px;
-            margin-top: 5px;
-        }
+        .signature-name { font-weight: bold; font-size: 8.5pt; color: #1e293b; }
+        .clinic-info { font-size: 7.5pt; color: #64748b; margin-top: 5px; }
+        .legends { font-size: 6.5pt; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 3px; margin-top: 3px; line-height: 1.1; }
     </style>
 </head>
 <body>
 
-    <!-- Fixed Footer applied to all pages -->
-    <div class="footer">
-        <div class="signature-area">
-            <div class="signature-line"></div>
-            <div class="signature-name">{{ $setting->doctor_name ?? 'Dr. Médico Tratante' }}</div>
-            <div style="font-size: 9pt; color: #64748b; margin-top: 3px;">Firma del Médico</div>
-        </div>
-
-        <div class="clinic-info">
-            <strong>Consultorio:</strong> {{ $setting->clinic_address ?? 'Dirección de la clínica' }} <br>
-            @if(!empty($setting->clinic_phone))
-                <strong>Tel:</strong> {{ $setting->clinic_phone }} &nbsp;&nbsp;&nbsp;&nbsp;
-            @endif
-            @if(!empty($setting->email))
-                <strong>Email:</strong> {{ $setting->email }}
-            @endif
-        </div>
-        
-        <div class="legends">
-            Receta médica expedida bajo la normatividad vigente. Sujeto a surtido según indicaciones.<br>
-            En caso de presentar reacciones adversas, suspender el medicamento y comunicarse de inmediato al consultorio.
-        </div>
-    </div>
-
-    <div class="container">
+@for ($i = 0; $i < 2; $i++)
+    <div class="half-page">
         <!-- Header -->
         <div class="header">
-            <div class="header-col" style="width: 18%; text-align: left;">
-                @if(!empty($setting->logo_path))
-                    <img src="{{ public_path('storage/' . $setting->logo_path) }}" style="max-width: 80px; max-height: 80px; object-fit: contain;" />
-                @else
-                    <img src="{{ public_path('derma_logo.jpg') }}" style="max-width: 80px; max-height: 80px;" />
-                @endif
-            </div>
-            <div class="header-col" style="width: 52%;">
-                <h1 class="doctor-name">{{ $setting->doctor_name ?? 'Dr. [Nombre del Médico]' }}</h1>
-                <p class="specialty">{{ $setting->specialty ?? 'Dermatología Clínica y Estética' }}</p>
-                <p class="credentials">
-                    {{ $setting->university ? $setting->university . ' | ' : '' }}
-                    Cédula Prof: {{ $setting->professional_id ?? 'XXXXXXX' }} 
-                </p>
-                @if(!empty($setting->specialty_id))
-                <p class="credentials">Cédula Esp: {{ $setting->specialty_id }}</p>
-                @endif
-            </div>
-            <div class="header-col" style="width: 30%; text-align: right; vertical-align: bottom;">
-                <p style="margin:0; font-size: 12pt; font-weight: bold; color: #0f172a;">Folio: <span style="color: #dc2626;">{{ $prescription->folio }}</span></p>
-                <p style="margin: 3px 0 0 0; font-size: 8pt; color: #64748b;">Fecha: {{ $prescription->created_at->format('d/m/Y H:i') }}</p>
-            </div>
+            <table>
+                <tr>
+                    <td style="width: 15%; text-align: left;">
+                        @if(!empty($setting->logo_path))
+                            <img src="{{ public_path('storage/' . $setting->logo_path) }}" style="max-width: 60px; max-height: 60px; object-fit: contain;" />
+                        @else
+                            <img src="{{ public_path('derma_logo.jpg') }}" style="max-width: 60px; max-height: 60px;" />
+                        @endif
+                    </td>
+                    <td style="width: 55%;">
+                        <div class="doctor-name">{{ $setting->doctor_name ?? 'Dr. [Nombre del Médico]' }}</div>
+                        <div class="specialty">{{ $setting->specialty ?? 'Dermatología Clínica y Estética' }}</div>
+                        <div class="credentials">
+                            {{ $setting->university ? $setting->university . ' | ' : '' }}
+                            Cédula Prof: {{ $setting->professional_id ?? 'XXXXXXX' }} 
+                            @if(!empty($setting->specialty_id))
+                            | Cédula Esp: {{ $setting->specialty_id }}
+                            @endif
+                        </div>
+                    </td>
+                    <td style="width: 30%; text-align: right; vertical-align: bottom;">
+                        <div style="font-size: 10pt; font-weight: bold; color: #0f172a;">Folio: <span style="color: #dc2626;">{{ $prescription->folio }}</span></div>
+                        <div style="font-size: 7.5pt; color: #64748b;">Fecha: {{ $prescription->created_at->format('d/m/Y H:i') }}</div>
+                        <div style="font-size: 7.5pt; color: #64748b; margin-top: 2px; font-weight: bold;">
+                            COPIA: {{ $i === 0 ? 'PACIENTE' : 'MÉDICO' }}
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <!-- Patient Info -->
         <div class="patient-box">
             <table class="patient-table">
                 <tr>
-                    <td width="60%"><span class="label">Paciente:</span> {{ $prescription->patient->first_name }} {{ $prescription->patient->last_name }}</td>
-                    <td width="40%"><span class="label">Edad:</span> {{ $prescription->patient->date_of_birth ? \Carbon\Carbon::parse($prescription->patient->date_of_birth)->age . ' años' : 'No especificada' }}</td>
+                    <td width="65%"><span class="label">Paciente:</span> {{ $prescription->patient->first_name }} {{ $prescription->patient->last_name }}</td>
+                    <td width="35%"><span class="label">Edad:</span> {{ $prescription->patient->date_of_birth ? \Carbon\Carbon::parse($prescription->patient->date_of_birth)->age . ' años' : 'No especificada' }}</td>
                 </tr>
                 <tr>
                     <td><span class="label">Diagnóstico:</span> {{ $prescription->consultation->diagnosis ?? 'Reservado' }}</td>
@@ -227,46 +163,78 @@
             </table>
         </div>
 
-        <div class="rx-title">
-            Rx.
-        </div>
+        <div class="rx-title">Rx.</div>
 
         <!-- Medications List -->
-        <div>
+        <div class="medications-container">
             @if($prescription->medications && is_array($prescription->medications))
+                <table style="width: 100%; border-collapse: collapse;">
                 @foreach($prescription->medications as $med)
-                    <div class="medication-item">
-                        @php
-                            $displayName = '';
-                            if (!empty($med['commercial_name'])) {
-                                $displayName .= strtoupper($med['commercial_name']);
-                                if (!empty($med['active_substance'])) {
-                                    $displayName .= ' - ' . strtoupper($med['active_substance']);
+                    <tr>
+                        <td style="padding-bottom: 4px;">
+                            @php
+                                $displayName = '';
+                                if (!empty($med['commercial_name'])) {
+                                    $displayName .= strtoupper($med['commercial_name']);
+                                    if (!empty($med['active_substance'])) {
+                                        $displayName .= ' - ' . strtoupper($med['active_substance']);
+                                    }
+                                } else {
+                                    $displayName .= strtoupper($med['name'] ?? '');
                                 }
-                            } else {
-                                $displayName .= strtoupper($med['name'] ?? '');
-                            }
-                        
-                            if (!empty($med['concentration'])) {
-                                $displayName .= ' ' . $med['concentration'];
-                            }
-                            if (!empty($med['route'])) {
-                                $displayName .= ', Vía ' . strtolower($med['route']);
-                            }
-                        @endphp
-                        <div class="medication-name">• {{ $displayName }}</div>
-                        <div class="medication-instructions">{{ $med['instructions'] ?? '' }}</div>
-                    </div>
+                            
+                                if (!empty($med['concentration'])) {
+                                    $displayName .= ' ' . $med['concentration'];
+                                }
+                                if (!empty($med['route'])) {
+                                    $displayName .= ', Vía ' . strtolower($med['route']);
+                                }
+                            @endphp
+                            <div class="medication-name">• {{ $displayName }}</div>
+                            <div class="medication-instructions">{{ $med['instructions'] ?? '' }}</div>
+                        </td>
+                    </tr>
                 @endforeach
+                </table>
             @endif
 
             @if($prescription->instructions)
                 <div class="general-instructions">
-                    <h4>Indicaciones Generales y Cuidados</h4>
+                    <h4>Indicaciones Generales</h4>
                     <p>{!! nl2br(e($prescription->instructions)) !!}</p>
                 </div>
             @endif
         </div>
+
+        <!-- Flowing Footer Area -->
+        <div class="footer-area">
+            <div class="signature-line"></div>
+            <div class="signature-name">{{ $setting->doctor_name ?? 'Dr. Médico Tratante' }}</div>
+            <div style="font-size: 7.5pt; color: #64748b;">Firma del Médico</div>
+
+            <div class="clinic-info">
+                <strong>Consultorio:</strong> {{ $setting->clinic_address ?? 'Dirección de la clínica' }} <br>
+                @if(!empty($setting->clinic_phone))
+                    <strong>Tel:</strong> {{ $setting->clinic_phone }} &nbsp;&nbsp;&nbsp;
+                @endif
+                @if(!empty($setting->email))
+                    <strong>Email:</strong> {{ $setting->email }}
+                @endif
+            </div>
+            
+            <div class="legends">
+                Receta médica expedida bajo la normatividad vigente. Sujeto a surtido según indicaciones.<br>
+                En caso de presentar reacciones adversas, suspender el medicamento y comunicarse de inmediato.
+            </div>
+        </div>
+
     </div>
+    
+    @if ($i === 0)
+    <div class="cut-line"></div>
+    @endif
+
+@endfor
+
 </body>
 </html>
