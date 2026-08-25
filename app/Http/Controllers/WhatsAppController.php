@@ -18,12 +18,20 @@ class WhatsAppController extends Controller
         ]);
 
         $phone = preg_replace('/\D/', '', $request->phone);
-        // Si el número entra como 521XXXXXXXXXX, lo normalizamos a 10 dígitos (México) para compararlo
-        // Esto depende de cómo lo guarda el doctor, pero asumamos que se compara directo con la DB
-        // En Node.js le quitamos el @c.us
+        // Estandarizar a formato E.164 (+) para guardar en BD
+        if (str_starts_with($phone, '521') && strlen($phone) == 13) {
+            $normalizedPhone = '+' . substr($phone, 0, 2) . substr($phone, 3); // quitar el 1
+        } elseif (str_starts_with($phone, '52') && strlen($phone) >= 12) {
+            $normalizedPhone = '+' . $phone;
+        } elseif (str_starts_with($phone, '1') && strlen($phone) == 11) {
+            $normalizedPhone = '+' . $phone;
+        } else {
+            // legacy fallback
+            $normalizedPhone = '+' . $phone;
+        }
 
         $msg = WhatsAppMessage::create([
-            'phone' => $phone,
+            'phone' => $normalizedPhone,
             'message' => $request->message,
             'is_from_patient' => true
         ]);
@@ -54,7 +62,7 @@ class WhatsAppController extends Controller
     // Obtener historial de mensajes de un número
     public function history($phone)
     {
-        // Normalizar teléfono
+        // Normalizar teléfono buscando los últimos 10 dígitos (seguro para US y MX)
         $phone = preg_replace('/\D/', '', $phone);
         $searchPhone = substr($phone, -10);
 
@@ -73,24 +81,27 @@ class WhatsAppController extends Controller
             'message' => 'required|string',
         ]);
 
-        $phone = preg_replace('/\D/', '', $request->phone);
-        
-        // Asegurar que tenga el código de país (521 para México por defecto si son 10 dígitos)
-        if (strlen($phone) === 10) {
-            $phone = '521' . $phone;
+        // Guardar el formato normalizado para la BD local (ej. +521234567890 o +11234567890)
+        // El bot ya maneja la conversión a formato baileys (521... / 1...)
+        $normalizedPhone = $request->phone;
+        if (!str_starts_with($normalizedPhone, '+')) {
+            $clean = preg_replace('/\D/', '', $normalizedPhone);
+            if (strlen($clean) == 10) {
+                $normalizedPhone = '+52' . $clean;
+            }
         }
 
-        // Llamamos al bot
+        // Llamamos al bot pasándole el número (el bot quita el + y convierte a formato Baileys)
         try {
             $botUrl = config('services.whatsapp.bot_url');
             $response = Http::post("{$botUrl}/api/send-message", [
-                'number' => $phone,
+                'number' => preg_replace('/\D/', '', $normalizedPhone), // El bot espera digitos
                 'message' => $request->message
             ]);
 
             if ($response->successful()) {
                 $msg = WhatsAppMessage::create([
-                    'phone' => $phone,
+                    'phone' => $normalizedPhone,
                     'message' => $request->message,
                     'is_from_patient' => false
                 ]);
