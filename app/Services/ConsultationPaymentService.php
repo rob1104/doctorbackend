@@ -111,8 +111,10 @@ class ConsultationPaymentService
     public function generatePdf(ConsultationPayment $payment)
     {
         $payment->load(['consultation.patient', 'creator']);
+        $setting = \App\Models\PrescriptionSetting::first();
         
-        $pdf = Pdf::loadView('pdf.payment_receipt', compact('payment'));
+        $pdf = Pdf::loadView('pdf.payment_receipt', compact('payment', 'setting'))
+                  ->setPaper('letter', 'portrait');
         
         return $pdf->download('nota_venta_'.$payment->id.'.pdf');
     }
