@@ -16,7 +16,7 @@ return new class extends Migration
             $table->time('start_time')->default('09:00:00');
             $table->time('end_time')->default('17:00:00');
             $table->integer('slot_duration')->default(30);
-            $table->json('working_days')->nullable();
+            $table->text('working_days')->nullable();
             $table->time('break_start_time')->nullable();
             $table->time('break_end_time')->nullable();
             $table->timestamps();
