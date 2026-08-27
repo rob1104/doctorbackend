@@ -153,11 +153,14 @@ class ConsultationController extends Controller
         $consultation->is_finished = true;
         $consultation->save();
 
+        $settings = \App\Models\AgendaSetting::getSettings();
+        $defaultPrice = $settings->consultation_price ?? 1500;
+
         // Crear registro de pago pendiente
         \App\Models\ConsultationPayment::firstOrCreate(
             ['consultation_id' => $consultation->id],
             [
-                'amount' => 500.00, // Default amount, ideally from a settings table
+                'amount' => $defaultPrice,
                 'paid' => false
             ]
         );
