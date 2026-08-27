@@ -15,10 +15,12 @@
         }
         .half-page {
             /* Letter height is 27.94cm. Half is 13.97cm */
-            height: 12.3cm; /* Adjusted height to account for padding manually without border-box */
+            height: 12.3cm; /* 13.97 - 1.6 (padding) = 12.37 */
+            max-height: 12.3cm;
             padding: 0.8cm 1.5cm;
             overflow: hidden;
             position: relative;
+            page-break-inside: avoid;
         }
         .cut-line {
             border-top: 1px dashed #94a3b8;
@@ -49,13 +51,13 @@
             margin-bottom: 8px;
             border-radius: 4px;
         }
-        .patient-table { width: 100%; border-collapse: collapse; font-size: 8pt; }
-        .patient-table td { padding: 2px 4px; vertical-align: top; }
-        .label { font-weight: bold; color: #475569; text-transform: uppercase; font-size: 7.5pt; }
+        .patient-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+        .patient-table td { padding: 1px 4px; }
+        .label { font-weight: bold; color: #475569; }
 
         .rx-title {
-            font-size: 16pt;
-            font-weight: 800;
+            font-size: 14pt;
+            font-weight: bold;
             color: #047857;
             font-style: italic;
             border-bottom: 1px solid #cbd5e1;
@@ -65,7 +67,9 @@
 
         .medications-container {
             font-size: 8pt;
-            padding-bottom: 3.5cm; /* Space for absolute footer */
+            height: 6cm; /* Force fixed height */
+            max-height: 6cm;
+            overflow: hidden; /* Prevent overflow onto next page */
         }
         .medication-item {
             margin-bottom: 4px;
