@@ -61,9 +61,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/medications/{id}', [\App\Http\Controllers\MedicationController::class, 'update']);
     Route::delete('/medications/{id}', [\App\Http\Controllers\MedicationController::class, 'destroy']);
 
-    // Configuración Membrete
+    // Configuración Membrete y Agenda
     Route::get('/prescription-settings', [\App\Http\Controllers\PrescriptionSettingController::class, 'show']);
     Route::post('/prescription-settings', [\App\Http\Controllers\PrescriptionSettingController::class, 'update']);
+    Route::get('/agenda-settings', [\App\Http\Controllers\AgendaSettingController::class, 'show']);
+    Route::post('/agenda-settings', [\App\Http\Controllers\AgendaSettingController::class, 'update']);
 
     // Dashboard Citas (Admin)
     Route::get('/appointments', [\App\Http\Controllers\AppointmentController::class, 'index']);

@@ -16,8 +16,11 @@ class AppointmentController extends Controller
         $date = $request->query('date', Carbon::today()->toDateString());
         $parsedDate = Carbon::parse($date);
         
-        // No hay citas los domingos
-        if ($parsedDate->isSunday()) {
+        $settings = \App\Models\AgendaSetting::getSettings();
+        $workingDays = $settings->working_days ?? []; // Array of days, e.g. [1,2,3,4,5]
+
+        // Carbon dayOfWeek: 0 = Sunday, 1 = Monday, etc.
+        if (!in_array($parsedDate->dayOfWeek, $workingDays)) {
             return response()->json([
                 'date' => $date,
                 'available_slots' => []
@@ -32,19 +35,34 @@ class AppointmentController extends Controller
         // Bloqueos manuales
         $blockedSlots = \App\Models\BlockedTimeSlot::where('date', $date)->get();
 
-        // Horario laboral de ejemplo: 09:00 a 17:00
-        $workStart = Carbon::createFromTimeString('09:00');
-        $workEnd = Carbon::createFromTimeString('17:00');
-        $slotDuration = 30; // Minutos por cita
+        // Horario laboral desde configuración
+        $workStart = Carbon::createFromTimeString($settings->start_time);
+        $workEnd = Carbon::createFromTimeString($settings->end_time);
+        $slotDuration = $settings->slot_duration; // Minutos por cita
+        
+        $hasBreak = $settings->break_start_time && $settings->break_end_time;
+        if ($hasBreak) {
+            $breakStart = Carbon::createFromTimeString($settings->break_start_time);
+            $breakEnd = Carbon::createFromTimeString($settings->break_end_time);
+        }
 
         $availableSlots = [];
         $currentSlot = $workStart->copy();
         
-        $parsedDate = Carbon::parse($date);
         $cutoffTime = Carbon::now()->addHour();
 
         while ($currentSlot < $workEnd) {
             $slotString = $currentSlot->format('H:i');
+            $slotEnd = $currentSlot->copy()->addMinutes($slotDuration);
+
+            // Si es la hora de descanso, omitir (si el slot choca con el descanso)
+            if ($hasBreak) {
+                // Checar si el currentSlot cae dentro del break
+                if ($currentSlot >= $breakStart && $currentSlot < $breakEnd) {
+                    $currentSlot->addMinutes($slotDuration);
+                    continue;
+                }
+            }
 
             // Si es hoy, ignorar las horas pasadas y la siguiente hora
             if ($parsedDate->isToday() && $currentSlot < $cutoffTime) {
