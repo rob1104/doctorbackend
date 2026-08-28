@@ -8,15 +8,21 @@ class MedicationService
 {
     public function searchMedications(string $searchQuery)
     {
-        $search = strtolower($searchQuery);
+        $searchTerms = array_filter(explode(' ', strtolower(trim($searchQuery))));
         
-        return Medication::where('status', 'active')
-            ->where(function($query) use ($search) {
-                $query->whereRaw('LOWER(generic_name) LIKE ?', ["%{$search}%"])
-                      ->orWhereRaw('LOWER(commercial_name) LIKE ?', ["%{$search}%"]);
-            })
-            ->limit(20)
-            ->get();
+        $query = Medication::where('status', 'active');
+        
+        foreach ($searchTerms as $term) {
+            $query->where(function($q) use ($term) {
+                $q->whereRaw('LOWER(generic_name) LIKE ?', ["%{$term}%"])
+                  ->orWhereRaw('LOWER(commercial_name) LIKE ?', ["%{$term}%"])
+                  ->orWhereRaw('LOWER(presentation) LIKE ?', ["%{$term}%"])
+                  ->orWhereRaw('LOWER(concentration) LIKE ?', ["%{$term}%"])
+                  ->orWhereRaw('LOWER(route) LIKE ?', ["%{$term}%"]);
+            });
+        }
+        
+        return $query->limit(20)->get();
     }
 
     public function findOrCreateMedication(string $name): Medication

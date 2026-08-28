@@ -26,6 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'me']);
     
+    // Auditoría
+    Route::get('/audit-logs', [\App\Http\Controllers\AuditLogController::class, 'index']);
+    
     // Citas
     Route::get('/appointments', [AppointmentController::class, 'index']);
     Route::patch('/appointments/{id}/status', [AppointmentController::class, 'updateStatus']);
