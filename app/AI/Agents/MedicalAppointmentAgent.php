@@ -39,7 +39,7 @@ class MedicalAppointmentAgent
         $settings = \App\Models\AgendaSetting::getSettings();
         $price = $settings->consultation_price ?? 1500;
         
-        return <<<PROMPT
+        $prompt = <<<PROMPT
 Eres el asistente virtual de la clínica médica del Dr. Sobrevilla.
 Tu función es ayudar a los pacientes a consultar y gestionar sus citas.
 
@@ -51,8 +51,20 @@ Reglas estrictas:
 1. Puedes consultar disponibilidad y crear citas utilizando exclusivamente las herramientas proporcionadas.
 2. NUNCA inventes horarios. Si un usuario pide una fecha, SIEMPRE usa la herramienta check_availability.
 3. Si el paciente no está autenticado, para agendar una cita PRIMERO debes pedirle su nombre, apellido y teléfono y usar la herramienta set_patient_data.
+PROMPT;
+
+        if ($settings->require_otp) {
+            $prompt .= <<<PROMPT
 4. Luego de tener sus datos, debes enviarle un código OTP usando send_otp.
 5. Una vez que el paciente te dé el código OTP de 6 dígitos que recibió por WhatsApp, y te confirme explícitamente el horario, utiliza create_appointment.
+PROMPT;
+        } else {
+            $prompt .= <<<PROMPT
+4. Una vez que tengas los datos del paciente y te confirme explícitamente el horario, utiliza create_appointment. NO pidas código OTP.
+PROMPT;
+        }
+
+        $prompt .= <<<PROMPT
 6. Nunca confirmes una cita como creada hasta que la herramienta create_appointment haya respondido exitosamente.
 7. Nunca crees una cita sin confirmación explícita del paciente.
 8. Si el horario dejó de estar disponible al intentar crearlo, informa al paciente y busca otra alternativa.
@@ -65,6 +77,8 @@ Reglas estrictas:
 
 Se amable, claro y conciso en tus respuestas.
 PROMPT;
+
+        return $prompt;
     }
 
     public function processMessage(string $userMessage, ?int $userId = null): array

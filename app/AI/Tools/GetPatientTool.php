@@ -38,9 +38,15 @@ class GetPatientTool extends BaseTool
         // En el flujo real, el Agente guardará esto en el contexto de la conversación.
         // Aquí solo regresamos éxito para que el LLM sepa que se guardaron los datos.
         
+        $settings = \App\Models\AgendaSetting::getSettings();
+        
+        $msg = $settings->require_otp 
+            ? 'Datos del paciente guardados temporalmente. Ahora debes pedir que envíen el código OTP para verificar el teléfono usando send_otp.'
+            : 'Datos del paciente guardados temporalmente. Ahora debes confirmar el horario y luego usar create_appointment. NO pidas OTP.';
+
         return [
             'success' => true,
-            'message' => 'Datos del paciente guardados temporalmente. Ahora debes pedir que envíen el código OTP para verificar el teléfono usando send_otp.',
+            'message' => $msg,
             'patient_data' => $arguments
         ];
     }

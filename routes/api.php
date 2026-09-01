@@ -81,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/availability/toggle-all', [\App\Http\Controllers\AppointmentController::class, 'toggleAllBlockedSlots']);
 
     // WhatsApp Chat (Admin)
+    Route::get('/whatsapp/status', [\App\Http\Controllers\WhatsAppController::class, 'status']);
     Route::get('/whatsapp/{phone}', [\App\Http\Controllers\WhatsAppController::class, 'history']);
     Route::post('/whatsapp/send', [\App\Http\Controllers\WhatsAppController::class, 'send']);
 

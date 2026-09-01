@@ -117,4 +117,27 @@ class WhatsAppController extends Controller
             return response()->json(['error' => 'Fallo la conexión con el bot de Node.', 'details' => $e->getMessage(), 'url' => config('services.whatsapp.bot_url')], 500);
         }
     }
+
+    // Obtener el estado de conexión del bot de WhatsApp
+    public function status()
+    {
+        try {
+            $botUrl = config('services.whatsapp.bot_url');
+            $response = Http::timeout(3)->get("{$botUrl}/api/status");
+            
+            if ($response->successful()) {
+                return response()->json($response->json());
+            }
+
+            return response()->json([
+                'status' => 'offline', 
+                'message' => 'El bot no responde correctamente.'
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'offline',
+                'message' => 'No se pudo conectar al bot de WhatsApp. Verifica que el servidor de Node.js esté corriendo.'
+            ], 500);
+        }
+    }
 }

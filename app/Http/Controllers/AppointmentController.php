@@ -90,7 +90,8 @@ class AppointmentController extends Controller
 
         return response()->json([
             'date' => $date,
-            'available_slots' => $availableSlots
+            'available_slots' => $availableSlots,
+            'require_otp' => $settings->require_otp
         ]);
     }
 
@@ -105,8 +106,7 @@ class AppointmentController extends Controller
             'type' => 'required|in:clinico,estetico',
             'appointment_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
-            'notes' => 'nullable|string',
-            'otp_code' => 'required|string|size:6'
+            'notes' => 'nullable|string'
         ]);
 
         // Verificar si la hora ya fue confirmada o está pendiente para otro paciente
@@ -121,20 +121,27 @@ class AppointmentController extends Controller
             ], 422);
         }
 
-        // Verificar OTP
-        $otp = \App\Models\OtpVerification::where('phone', $request->phone)
-            ->where('code', $request->otp_code)
-            ->where('is_verified', false)
-            ->where('expires_at', '>', Carbon::now())
-            ->first();
+        $settings = \App\Models\AgendaSetting::getSettings();
+        if ($settings->require_otp) {
+            $request->validate([
+                'otp_code' => 'required|string|size:6'
+            ]);
 
-        if (!$otp) {
-            return response()->json(['error' => 'Código OTP inválido o expirado.'], 400);
+            // Verificar OTP
+            $otp = \App\Models\OtpVerification::where('phone', $request->phone)
+                ->where('code', $request->otp_code)
+                ->where('is_verified', false)
+                ->where('expires_at', '>', Carbon::now())
+                ->first();
+
+            if (!$otp) {
+                return response()->json(['error' => 'Código OTP inválido o expirado.'], 400);
+            }
+
+            // Marcar OTP como verificado
+            $otp->is_verified = true;
+            $otp->save();
         }
-
-        // Marcar OTP como verificado
-        $otp->is_verified = true;
-        $otp->save();
 
         // Registrar o actualizar paciente
         $patient = Patient::firstOrCreate(

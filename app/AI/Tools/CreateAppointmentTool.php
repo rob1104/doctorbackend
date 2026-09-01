@@ -71,23 +71,27 @@ class CreateAppointmentTool extends BaseTool
 
         // 1. Validar OTP si no hay patient_id
         if (!$patientId) {
-            if (!$phone || !$otpCode) {
-                return ['error' => 'Para agendar sin sesión iniciada, se requiere teléfono y código OTP.'];
+            $settings = \App\Models\AgendaSetting::getSettings();
+            
+            if ($settings->require_otp) {
+                if (!$phone || !$otpCode) {
+                    return ['error' => 'Para agendar sin sesión iniciada, se requiere teléfono y código OTP.'];
+                }
+
+                $otp = OtpVerification::where('phone', $phone)
+                    ->where('code', $otpCode)
+                    ->where('is_verified', false)
+                    ->where('expires_at', '>', Carbon::now())
+                    ->first();
+
+                if (!$otp) {
+                    return ['error' => 'El código OTP es inválido o ha expirado. Por favor, solicita uno nuevo o verifica el código.'];
+                }
+
+                // Marcar OTP verificado
+                $otp->is_verified = true;
+                $otp->save();
             }
-
-            $otp = OtpVerification::where('phone', $phone)
-                ->where('code', $otpCode)
-                ->where('is_verified', false)
-                ->where('expires_at', '>', Carbon::now())
-                ->first();
-
-            if (!$otp) {
-                return ['error' => 'El código OTP es inválido o ha expirado. Por favor, solicita uno nuevo o verifica el código.'];
-            }
-
-            // Marcar OTP verificado
-            $otp->is_verified = true;
-            $otp->save();
 
             // Buscar o crear paciente
             $patient = Patient::firstOrCreate(

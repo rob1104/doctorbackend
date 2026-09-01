@@ -26,7 +26,8 @@ class AgendaSetting extends Model
         'consultation_price',
         'working_days',
         'break_start_time',
-        'break_end_time'
+        'break_end_time',
+        'require_otp'
     ];
 
     protected $casts = [
@@ -44,7 +45,8 @@ class AgendaSetting extends Model
                 'consultation_price' => 1500,
                 'working_days' => [1, 2, 3, 4, 5, 6], // Lunes a Sabado por defecto
                 'break_start_time' => null,
-                'break_end_time' => null
+                'break_end_time' => null,
+                'require_otp' => true
             ]);
         }
         return $settings;
