@@ -32,6 +32,7 @@ class AgendaSetting extends Model
 
     protected $casts = [
         'working_days' => 'array',
+        'require_otp' => 'boolean',
     ];
 
     public static function getSettings()
