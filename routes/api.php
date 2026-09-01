@@ -93,6 +93,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/cobranza/{id}', [\App\Http\Controllers\ConsultationPaymentController::class, 'update']);
     Route::get('/cobranza/{id}/pdf', [\App\Http\Controllers\ConsultationPaymentController::class, 'generatePdf']);
     // Usuarios
+    Route::post('users/{id}/restore', [\App\Http\Controllers\UserController::class, 'restore']);
+    Route::delete('users/{id}/force', [\App\Http\Controllers\UserController::class, 'forceDelete']);
     Route::apiResource('users', \App\Http\Controllers\UserController::class);
     // Notificaciones
     Route::get('/notifications', [\App\Http\Controllers\AdminNotificationController::class, 'index']);

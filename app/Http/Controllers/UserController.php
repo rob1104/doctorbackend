@@ -20,12 +20,18 @@ class UserController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $this->authorizeAdmin();
-        // Return all non-deleted users
-        $users = User::orderBy('name')->get();
-        return response()->json($users);
+        $query = User::orderBy('name');
+
+        if ($request->has('trashed') && $request->trashed == 'true') {
+            $query->onlyTrashed();
+        } else if ($request->has('all') && $request->all == 'true') {
+            $query->withTrashed();
+        }
+
+        return response()->json($query->get());
     }
 
     public function store(Request $request)
@@ -79,6 +85,30 @@ class UserController extends Controller
         }
 
         $user->delete(); // Soft delete because of the trait in the model
-        return response()->json(['message' => 'Usuario eliminado correctamente']);
+        return response()->json(['message' => 'Usuario eliminado temporalmente']);
+    }
+
+    public function restore($id)
+    {
+        $this->authorizeAdmin();
+
+        $user = User::withTrashed()->findOrFail($id);
+        $user->restore();
+
+        return response()->json(['message' => 'Usuario restaurado correctamente']);
+    }
+
+    public function forceDelete($id)
+    {
+        $this->authorizeAdmin();
+
+        $user = User::withTrashed()->findOrFail($id);
+
+        if ($user->id === auth()->id()) {
+            return response()->json(['message' => 'No puedes eliminar definitivamente tu propia cuenta.'], 403);
+        }
+
+        $user->forceDelete();
+        return response()->json(['message' => 'Usuario eliminado definitivamente']);
     }
 }

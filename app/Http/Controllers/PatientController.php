@@ -95,6 +95,11 @@ class PatientController extends Controller
     public function destroy($id)
     {
         $patient = Patient::findOrFail($id);
+
+        if ($patient->consultations()->count() > 0) {
+            return response()->json(['message' => 'No es posible eliminar un paciente que ya tiene historial de consultas.'], 403);
+        }
+
         $patient->delete();
         return response()->json(['message' => 'Paciente eliminado']);
     }
