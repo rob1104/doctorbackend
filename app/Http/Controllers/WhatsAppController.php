@@ -132,12 +132,12 @@ class WhatsAppController extends Controller
             return response()->json([
                 'status' => 'offline', 
                 'message' => 'El bot no responde correctamente.'
-            ], 500);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'offline',
                 'message' => 'No se pudo conectar al bot de WhatsApp. Verifica que el servidor de Node.js esté corriendo.'
-            ], 500);
+            ], 200);
         }
     }
 }
